@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #fdf8f3;
+  --color-foreground: #1c1008;
+
+  --color-brand-50:  #fdf5ec;
+  --color-brand-100: #fae6cc;
+  --color-brand-200: #f4c99a;
+  --color-brand-300: #eca566;
+  --color-brand-400: #e07f38;
+  --color-brand-500: #c4621a;
+  --color-brand-600: #9b4a12;
+  --color-brand-700: #7a380d;
+  --color-brand-800: #5a2809;
+  --color-brand-900: #3d1b06;
+
+  --color-earth-50:  #f5f2ed;
+  --color-earth-100: #e8e1d5;
+  --color-earth-200: #cfc0aa;
+  --color-earth-300: #b49c7e;
+  --color-earth-400: #8c7155;
+  --color-earth-500: #6b5340;
+  --color-earth-600: #503d2e;
+  --color-earth-700: #3a2c20;
+  --color-earth-800: #261e15;
+  --color-earth-900: #14100b;
+
+  --color-forest-50:  #eef4ed;
+  --color-forest-100: #d4e6d2;
+  --color-forest-200: #a8cba3;
+  --color-forest-300: #79aa72;
+  --color-forest-400: #4e8647;
+  --color-forest-500: #326531;
+  --color-forest-600: #234d22;
+  --color-forest-700: #183818;
+  --color-forest-800: #0e2410;
+  --color-forest-900: #071208;
+
+  --color-cream: #fdf8f3;
+  --color-gold: #c8943a;
+
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-foreground);
+  font-family: var(--font-inter), Georgia, sans-serif;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-playfair), Georgia, serif;
+}
