@@ -106,9 +106,9 @@ export default function Footer() {
             </div>
 
             <div className="mt-6 p-4 bg-earth-800/50 rounded-xl text-sm">
-              <p className="text-earth-300 font-medium mb-1">Check-in / Check-out</p>
-              <p className="text-earth-400 text-xs">Check-in: from 2:00 PM</p>
-              <p className="text-earth-400 text-xs">Check-out: by 10:00 AM</p>
+              <p className="text-cream font-medium mb-1">Check-in / Check-out</p>
+              <p className="text-earth-200 text-xs">Check-in: from 2:00 PM</p>
+              <p className="text-earth-200 text-xs">Check-out: by 10:00 AM</p>
             </div>
           </div>
         </div>

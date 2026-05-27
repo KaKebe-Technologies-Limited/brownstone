@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3";
-import { Calendar, User, Mail, Phone, Users, CheckCircle2 } from "lucide-react";
+import { Calendar, User, Mail, Phone, Users, Loader2 } from "lucide-react";
 
 const rooms = [
   { name: "Bridal Cottage", priceUSD: 99, priceUGX: 360000 },
@@ -35,8 +34,8 @@ export default function BookingForm() {
   });
 
   const [currency, setCurrency] = useState<Currency>("UGX");
-  const [submitted, setSubmitted] = useState(false);
-  const [txRef] = useState(generateRef);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const selectedRoom = rooms.find((r) => r.name === form.room) ?? rooms[0];
 
@@ -55,82 +54,48 @@ export default function BookingForm() {
   const totalUSD = selectedRoom.priceUSD * Math.max(nights, 1);
   const displayAmount = currency === "UGX" ? totalUGX : totalUSD;
 
-  const config = {
-    public_key: process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY ?? "FLWPUBK_TEST-XXXX",
-    tx_ref: txRef,
-    amount: displayAmount,
-    currency,
-    payment_options: currency === "UGX" ? "mobilemoneyghandaoruganda,card" : "card",
-    customer: {
-      email: form.email,
-      phone_number: form.phone,
-      name: form.name,
-    },
-    customizations: {
-      title: "Brownstone Country Home",
-      description: `${form.room} · ${Math.max(nights, 1)} night${nights !== 1 ? "s" : ""}`,
-      logo: "https://www.brownstone-lira.ug/logo.png",
-    },
-    meta: {
-      room: form.room,
-      checkin: form.checkin,
-      checkout: form.checkout,
-      guests: form.guests,
-      special_requests: form.requests,
-    },
-  };
-
-  const handleFlutterPayment = useFlutterwave(config);
-
   function set(field: string, value: string | number) {
     setForm((f) => ({ ...f, [field]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    handleFlutterPayment({
-      callback: (response) => {
-        closePaymentModal();
-        if (response.status === "successful") {
-          setSubmitted(true);
-        }
-      },
-      onClose: () => {},
-    });
-  }
+    setSubmitting(true);
+    setError(null);
 
-  if (submitted) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center py-20 px-4">
-        <CheckCircle2 size={56} className="text-forest-500 mb-6" />
-        <h2 className="font-serif text-3xl font-bold text-earth-800 mb-3">
-          Booking Confirmed!
-        </h2>
-        <p className="text-earth-500 max-w-md mb-2">
-          Thank you, {form.name}. Your payment was received and your room is
-          reserved.
-        </p>
-        <p className="text-earth-400 text-sm max-w-md mb-8">
-          A confirmation has been sent to <strong>{form.email}</strong>. George
-          will also reach out on WhatsApp to confirm your arrival time.
-        </p>
-        <div className="bg-earth-50 rounded-xl p-6 text-left text-sm max-w-sm w-full border border-earth-200">
-          <p className="font-semibold text-earth-800 mb-3">Booking Summary</p>
-          <div className="space-y-1.5 text-earth-500">
-            <p><span className="text-earth-700 font-medium">Room:</span> {form.room}</p>
-            <p><span className="text-earth-700 font-medium">Check-in:</span> {form.checkin}</p>
-            <p><span className="text-earth-700 font-medium">Check-out:</span> {form.checkout}</p>
-            <p><span className="text-earth-700 font-medium">Guests:</span> {form.guests}</p>
-            <p>
-              <span className="text-earth-700 font-medium">Total paid:</span>{" "}
-              {currency === "UGX"
-                ? `UGX ${totalUGX.toLocaleString()}`
-                : `USD ${totalUSD}`}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    const nameParts = form.name.trim().split(/\s+/);
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || firstName;
+
+    try {
+      const res = await fetch("/api/pesapal/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: generateRef(),
+          currency,
+          amount: displayAmount,
+          description: `${form.room} · ${Math.max(nights, 1)} night${nights !== 1 ? "s" : ""} · ${form.name}`,
+          billing: {
+            email: form.email,
+            phone: form.phone,
+            firstName,
+            lastName,
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Failed to initiate payment");
+      }
+
+      const { redirect_url } = await res.json();
+      window.location.href = redirect_url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -311,18 +276,32 @@ export default function BookingForm() {
             {nights === 0 && <span className="text-xs font-normal text-earth-400 ml-1">(1 night min)</span>}
           </span>
         </div>
-        <p className="text-xs text-earth-400">Breakfast included · Secure payment via Flutterwave</p>
+        <p className="text-xs text-earth-400">Breakfast included · Secure payment via Pesapal</p>
       </div>
+
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
       <button
         type="submit"
-        className="w-full py-4 bg-brand-600 hover:bg-brand-500 text-cream font-bold rounded-xl text-base transition-colors shadow-sm"
+        disabled={submitting}
+        className="w-full py-4 bg-brand-600 hover:bg-brand-500 disabled:bg-earth-300 text-cream font-bold rounded-xl text-base transition-colors shadow-sm flex items-center justify-center gap-2"
       >
-        Pay & Confirm Booking
+        {submitting ? (
+          <>
+            <Loader2 size={18} className="animate-spin" />
+            Connecting to Pesapal...
+          </>
+        ) : (
+          "Pay & Confirm Booking"
+        )}
       </button>
 
       <p className="text-center text-xs text-earth-400">
-        Payments are processed securely by Flutterwave. MTN Mobile Money, Airtel
+        Payments are processed securely by Pesapal. MTN Mobile Money, Airtel
         Money, Visa &amp; Mastercard accepted. Funds go directly to Brownstone
         Country Home.
       </p>

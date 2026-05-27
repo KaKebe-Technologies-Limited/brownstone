@@ -65,7 +65,7 @@ export default function BookPage() {
                 <div>
                   <p className="text-earth-800 font-semibold text-sm">Secure Payments</p>
                   <p className="text-earth-400 text-xs mt-0.5">
-                    Processed by Flutterwave — licensed by Bank of Uganda
+                    Processed by Pesapal — trusted across East Africa
                   </p>
                 </div>
               </div>

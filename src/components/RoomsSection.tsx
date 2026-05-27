@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Users, BedDouble, Maximize2 } from "lucide-react";
 
 const rooms = [
@@ -81,10 +82,12 @@ export default function RoomsSection() {
             >
               {/* Image */}
               <div className="relative h-56 overflow-hidden bg-earth-100">
-                <img
+                <Image
                   src={room.image}
                   alt={room.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-3 left-3">
                   <span className="bg-earth-900/80 text-cream text-xs px-2.5 py-1 rounded-full">
