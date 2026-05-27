@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { id, currency, amount, description, billing, callbackUrl, cancellationUrl } = body;
 
-    if (!id || !currency || !amount || !billing?.email) {
+    if (!id || !currency || !amount || !billing?.phone) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }

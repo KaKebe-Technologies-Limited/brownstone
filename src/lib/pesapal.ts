@@ -80,7 +80,7 @@ export interface OrderRequest {
   callbackUrl: string;
   cancellationUrl?: string;
   billing: {
-    email: string;
+    email?: string;
     phone: string;
     firstName: string;
     lastName: string;
@@ -118,7 +118,7 @@ export async function submitOrder(
         notification_id: notificationId,
         redirect_mode: "TOP_WINDOW",
         billing_address: {
-          email_address: order.billing.email,
+          email_address: order.billing.email || undefined,
           phone_number: order.billing.phone,
           first_name: order.billing.firstName,
           last_name: order.billing.lastName,

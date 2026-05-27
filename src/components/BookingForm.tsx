@@ -77,7 +77,7 @@ export default function BookingForm() {
           amount: displayAmount,
           description: `${form.room} · ${Math.max(nights, 1)} night${nights !== 1 ? "s" : ""} · ${form.name}`,
           billing: {
-            email: form.email,
+            email: form.email || undefined,
             phone: form.phone,
             firstName,
             lastName,
@@ -224,14 +224,16 @@ export default function BookingForm() {
         </div>
         <div>
           <label className="block text-sm font-medium text-earth-700 mb-1.5">
-            <span className="flex items-center gap-1.5"><Mail size={14} /> Email Address</span>
+            <span className="flex items-center gap-1.5">
+              <Mail size={14} /> Email Address{" "}
+              <span className="text-earth-400 font-normal">(optional)</span>
+            </span>
           </label>
           <input
             type="email"
             value={form.email}
             onChange={(e) => set("email", e.target.value)}
             placeholder="your@email.com"
-            required
             className="w-full px-3 py-2.5 rounded-lg border border-earth-200 bg-white text-earth-800 text-sm placeholder-earth-300 focus:outline-none focus:ring-2 focus:ring-brand-400"
           />
         </div>
