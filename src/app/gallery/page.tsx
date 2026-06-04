@@ -17,7 +17,8 @@ export default function GalleryPage() {
     import("glightbox").then((mod) => {
       lightboxRef.current?.destroy();
       lightboxRef.current = mod.default({
-        elements: allImages.slice(0, visible).map((src) => ({ href: src, type: "image" })),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        elements: allImages.slice(0, visible).map((src) => ({ href: src, type: "image" })) as any,
       });
     });
     return () => lightboxRef.current?.destroy();
