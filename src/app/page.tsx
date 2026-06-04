@@ -2,6 +2,7 @@ import Hero from "@/components/Hero";
 import Highlights from "@/components/Highlights";
 import RoomsSection from "@/components/RoomsSection";
 import Amenities from "@/components/Amenities";
+import Gallery from "@/components/GalleryTeaser";
 import Reviews from "@/components/Reviews";
 import Location from "@/components/Location";
 import BookingCTA from "@/components/BookingCTA";
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Highlights />
       <RoomsSection />
       <Amenities />
+      <Gallery />
       <Reviews />
       <Location />
       <BookingCTA />
